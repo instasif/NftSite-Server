@@ -48,6 +48,14 @@ async function run() {
       const nfts = await nftCollections.find(query).toArray();
       res.send(nfts)
   })
+    
+    // to upload new nft's data
+    app.post('/nfts',async(req,res)=>{
+    const nfts = req.body;
+    const result = await nftCollections.insertOne(product);
+    res.send(result);
+})
+    
   } finally {
   }
 }
