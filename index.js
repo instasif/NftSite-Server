@@ -24,13 +24,30 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    const nftCollections = client.db("nftsite").collection("nfts");
+     const nftCollections = client.db("nftsite").collection("nfts");
 
-    app.get('/nfts', async(req, res) =>{
+
+    // to display all card        
+    app.get('/all-nfts', async(req, res) =>{
       const query = {};
       const nfts = await nftCollections.find(query).toArray();
       res.send(nfts);
     })
+
+    // to display only 4 card in the Home page
+    app.get('/nfts', async(req, res) =>{
+      const query = {};
+      const nfts = await nftCollections.find(query).limit(4).toArray();
+      res.send(nfts);
+    })
+
+    // to visit nfts details page according to nfts id
+    app.get('/nfts/:id', async(req, res)=>{
+      const id = req.params.id;
+      const query={nfts_id:id};
+      const nfts = await nftCollections.find(query).toArray();
+      res.send(nfts)
+  })
   } finally {
   }
 }
