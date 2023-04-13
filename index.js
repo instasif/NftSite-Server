@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/", async (req, res) => {
-  res.send("Nft server is running.....");
+  res.send({ status: true, message: "Nft server is running....." });
 });
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.2lbo3hl.mongodb.net/?retryWrites=true&w=majority`;
@@ -24,6 +24,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const nftCollections = client.db("nftsite").collection("nfts");
+    const userCollection = client.db("nftsite").collection("user");
 
     // to display all card
     app.get("/all-nfts", async (req, res) => {
@@ -39,24 +40,33 @@ async function run() {
       res.send(nfts);
     });
 
-    // to visit nfts details page according to nfts id
+    // to visit nfts details page according to nfts id    (re-check pendding)
     app.get("/nfts/:id", async (req, res) => {
-      try {
       const id = req.params.id;
-      console.log(id);
-      const query = { _id: id };
-      const nfts = await nftCollections.find(query).toArray();
+      const query = { _id: ObjectId(id) };
+      const nfts = await nftCollections.findOne(query).toArray();
       res.send(nfts);
-      } catch (error) {
-        console.error(error);
-        res,send(error.message)
-      }
     });
 
     // to upload new nft's data
     app.post("/nfts", async (req, res) => {
       const nfts = req.body;
       const result = await nftCollections.insertOne(nfts);
+      res.send(result);
+    });
+
+    app.post("/user", async (req, res) => {
+      const user = req.body;
+      const findUser = await userCollection.findOne({ email: user.email });
+      if (findUser === null) {
+        const result = await userCollection.insertOne(user);
+        return res.send(result);
+      }
+      res.send({ status: false, message: "user already added by database" });
+    });
+
+    app.get("/user", async (req, res) => {
+      const result = await userCollection.find({}).toArray();
       res.send(result);
     });
   } finally {
