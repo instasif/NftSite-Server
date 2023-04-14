@@ -67,10 +67,36 @@ async function run() {
       res.send({ status: false, message: "user already added by database" });
     });
 
+    app.patch("/updateUser", async (req, res) => {
+      const user = req.body;
+      const { role, collectionName, bio, coverPhoto, chain, email } = user;
+      const filter = { email: email }
+      const options = { upsert: true };
+
+      const updateDoc = {
+        $set: {
+          role,
+          collectionName,
+          bio,
+          coverPhoto,
+          chain
+        },
+      };
+
+      const result = await userCollection.updateOne(filter, updateDoc, options)
+      res.send({ status: true, data: result })
+
+    });
+
     // to get user information
 
     app.get("/users", async (req, res) => {
       const result = await userCollection.find({}).toArray();
+      res.send(result);
+    });
+    app.get("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      const result = await userCollection.findOne({ email: email });
       res.send(result);
     });
   } finally {
