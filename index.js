@@ -40,11 +40,12 @@ async function run() {
       res.send(nfts);
     });
 
+    // upload NFT 
     app.post("/uploadNft", async (req, res) => {
       const product = req.body;
       const result = await nftCollections.insertOne(product);
       res.send(result);
-      console.log(result)
+      console.log(result);
     });
 
     // to visit nfts details page according to nfts id    (re-check pendding)
@@ -77,7 +78,7 @@ async function run() {
     app.patch("/updateUser", async (req, res) => {
       const user = req.body;
       const { role, collectionName, bio, coverPhoto, chain, email } = user;
-      const filter = { email: email }
+      const filter = { email: email };
       const options = { upsert: true };
 
       const updateDoc = {
@@ -86,13 +87,12 @@ async function run() {
           collectionName,
           bio,
           coverPhoto,
-          chain
+          chain,
         },
       };
 
-      const result = await userCollection.updateOne(filter, updateDoc, options)
-      res.send({ status: true, data: result })
-
+      const result = await userCollection.updateOne(filter, updateDoc, options);
+      res.send({ status: true, data: result });
     });
 
     // to get user information
@@ -101,6 +101,8 @@ async function run() {
       const result = await userCollection.find({}).toArray();
       res.send(result);
     });
+
+    // to get specific one user information
     app.get("/users/:email", async (req, res) => {
       const email = req.params.email;
       const result = await userCollection.findOne({ email: email });
