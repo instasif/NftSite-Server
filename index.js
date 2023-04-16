@@ -49,11 +49,11 @@ async function run() {
     });
 
     // to visit nfts details page according to nfts id    (re-check pendding)
-    app.get("/nfts/:id", async (req, res) => {
+    app.get("/nft/:id", async (req, res) => {
       const id = req.params.id;
-      const query = { _id: ObjectId(id) };
-      const nfts = await nftCollections.findOne(query).toArray();
-      res.send(nfts);
+      const query = { _id: new ObjectId(id) };
+      const nft = await nftCollections.findOne(query);
+      res.send(nft);
     });
 
     // to upload new nft's data
