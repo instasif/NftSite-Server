@@ -40,6 +40,13 @@ async function run() {
       res.send(nfts);
     });
 
+    app.post("/uploadNft", async (req, res) => {
+      const product = req.body;
+      const result = await nftCollections.insertOne(product);
+      res.send(result);
+      console.log(result)
+    });
+
     // to visit nfts details page according to nfts id    (re-check pendding)
     app.get("/nfts/:id", async (req, res) => {
       const id = req.params.id;
