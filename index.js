@@ -75,6 +75,7 @@ async function run() {
       res.send({ status: false, message: "user already added by database" });
     });
 
+    //upload a seller nft
     app.patch("/updateUser", async (req, res) => {
       const user = req.body;
       const { role, collectionName, bio, coverPhoto, chain, email } = user;
