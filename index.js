@@ -56,6 +56,13 @@ async function run() {
       res.send(nft);
     });
 
+    app.get("/nftsByUser/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const nfts = (await nftCollections.find(query).toArray()).reverse();
+      res.send(nfts);
+    });
+
     // to upload new nft's data
     app.post("/nfts", async (req, res) => {
       const nfts = req.body;
