@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const port = process.env.PORT || 5000;
 require("dotenv").config();
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const app = express();
 
@@ -25,6 +26,7 @@ async function run() {
   try {
     const nftCollections = client.db("nftsite").collection("nfts");
     const userCollection = client.db("nftsite").collection("user");
+    const paymentCollection = client.db("nftsite").collection("payment");
 
     // to display all card
     app.get("/all-nfts", async (req, res) => {
@@ -102,6 +104,41 @@ async function run() {
       const result = await userCollection.updateOne(filter, updateDoc, options);
       res.send({ status: true, data: result });
     });
+
+    //create payment method
+    app.post("/create-payment-intent", async (req, res) => {
+      const product = req.body;
+      const amount = parseFloat(product.price) * 100;
+      console.log(amount)
+      if (product && amount) {
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: amount,
+          currency: "usd",
+          "payment_method_types": [
+            "card"
+          ]
+        });
+        return res.send({
+          clientSecret: paymentIntent.client_secret,
+        });
+      }
+
+      res.send({ status: false, message: "amount not found" })
+    });
+
+
+    app.post('/payment-info', async (req, res) => {
+      try {
+        const info = req.body;
+        console.log(info)
+        const result = await paymentCollection.insertOne(info);
+        res.send(result)
+      }
+      catch {
+        res.send({ status: false, massage: 'payment info not added a database' })
+      }
+    })
+
 
     // to get user information
 
