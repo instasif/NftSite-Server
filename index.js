@@ -42,12 +42,11 @@ async function run() {
       res.send(nfts);
     });
 
-    // upload NFT 
+    // upload NFT
     app.post("/uploadNft", async (req, res) => {
       const product = req.body;
       const result = await nftCollections.insertOne(product);
       res.send(result);
-      console.log(result);
     });
 
     // to visit nfts details page according to nfts id    (re-check pendding)
@@ -109,36 +108,32 @@ async function run() {
     app.post("/create-payment-intent", async (req, res) => {
       const product = req.body;
       const amount = parseFloat(product.price) * 100;
-      console.log(amount)
       if (product && amount) {
         const paymentIntent = await stripe.paymentIntents.create({
           amount: amount,
           currency: "usd",
-          "payment_method_types": [
-            "card"
-          ]
+          payment_method_types: ["card"],
         });
         return res.send({
           clientSecret: paymentIntent.client_secret,
         });
       }
 
-      res.send({ status: false, message: "amount not found" })
+      res.send({ status: false, message: "amount not found" });
     });
 
-
-    app.post('/payment-info', async (req, res) => {
+    app.post("/payment-info", async (req, res) => {
       try {
         const info = req.body;
-        console.log(info)
         const result = await paymentCollection.insertOne(info);
-        res.send(result)
+        res.send(result);
+      } catch {
+        res.send({
+          status: false,
+          massage: "payment info not added a database",
+        });
       }
-      catch {
-        res.send({ status: false, massage: 'payment info not added a database' })
-      }
-    })
-
+    });
 
     // to get user information
 
